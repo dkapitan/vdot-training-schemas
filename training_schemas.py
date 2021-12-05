@@ -4,6 +4,11 @@ import pandas as pd
 import pendulum
 
 
+def pp(timedelta):
+    """Pretty print timedelta rounded to seconds."""
+    return timedelta.round(freq="s").__str__()[-8:]
+
+
 def parse_duration(duration):
     """Parse duration in string format MM:SS or HH:MM:SS as pendulum duration."""
     
@@ -21,11 +26,23 @@ def parse_duration(duration):
 vdot_table = pd.read_csv("vdot.csv", index_col=0, converters={i: parse_duration for i in range(1,10)})
 
 
-def olga_bondarenko_interval(vdot):
-    def pp(timedelta):
-        """Pretty print timedelta rounded to seconds."""
-        return timedelta.round(freq="s").__str__()[-8:]
+def vit(vdot):
+    """Calculate paces for Variable Interval Tempo (VIT) training"""
+    racetimes = vdot_table.loc[vdot,:]
+    paces = {
+        "marathon": racetimes.marathon / 42.190,
+        "5k": racetimes._5k / 5,
+    }
+    doc = f"""
+    Your Variable Interval Tempo (VIT) training paces and times are:
+      VDOT:       {vdot}
+      - marathon: {pp(paces['marathon'])} ({pp((0.4 * paces['marathon']))}) 
+      - 5k:       {pp(paces['5k'])} ({pp((0.4 * paces['5k']))})
+    """
+    print(doc)
 
+
+def olga_bondarenko_interval(vdot):
 
     racetimes = vdot_table.loc[vdot,:]
     paces = {
